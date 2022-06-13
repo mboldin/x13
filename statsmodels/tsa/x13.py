@@ -1,6 +1,7 @@
 """
-Run x12/x13-arima specs in a subprocess from Python and curry results back
-into python.
+Run x12/x13-arima specs in one of the standalone program, in a subprocess and curry results back into Python.
+
+*** MDB edits
 
 Notes
 -----
@@ -47,8 +48,23 @@ _bool_to_yes_no = lambda x: 'yes' if x else 'no'  # noqa:E731
 
 def _find_x12(x12path=None, prefer_x13=True):
     """
-    If x12path is not given, then either x13as[.exe] or x12a[.exe] must
-    be found on the PATH. Otherwise, the environmental variable X12PATH or
+    Tries to run one of the possible X12/X13 porgrams based on a given or
+    defined path.  The possible programs names are given in the 
+    (usually either x13as[.exe] or x12a[.exe]) must
+     
+    **** HERE MDB 6/13/2022
+    
+    binary_names
+    
+    if x12path is not given, it can eb defined by an environment
+    variable: X12PATH or X13PATH.
+    
+    , one of the X12/X13 standalone programs in
+    _binary_names (usually either x13as[.exe] or x12a[.exe]) must
+    be found on the path. If x12path-None and neither X12PATH or X13PATH are
+    defined, then one of he binaries must be in the current working directory 
+    
+    Otherwise, the environmental variable X12PATH or
     X13PATH must be defined. If prefer_x13 is True, only X13PATH is searched
     for. If it is false, only X12PATH is searched for.
     """
@@ -67,7 +83,9 @@ def _find_x12(x12path=None, prefer_x13=True):
         x12path = os.getenv("X13PATH", "")
         if not x12path:
             x12path = os.getenv("X12PATH", "")
-
+    
+    # Loop through possible program names, append to path and 
+    # accept the first one that is sucessfull in a subprocess call
     for binary in _binary_names:
         x12 = os.path.join(x12path, binary)
         try:
